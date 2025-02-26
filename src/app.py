@@ -69,6 +69,27 @@ def test():
 
     return jsonify(response_body), 200
 
+@app.route('/empresa', methods=['POST'])
+def add_company():
+    print(request)
+    print(request.get_json())
+    body = request.get_json()
+
+    if "nombre" not in body:
+        return "debes enviarme le nombre"
+    if body["nombre"] == '':
+        return "el nombre no puede ser vacio"
+
+    empresa = Empresa(nombre=body["nombre"], ciudad=body["ciudad"], slogan=body["slogan"])
+    db.session.add(empresa)
+    db.session.commit()
+
+    response_body = {
+        "msg": "voy a crear una empreas  "
+    }
+
+    return jsonify(response_body), 200
+
 @app.route('/empresa', methods=['GET'])
 def get_empresas():
     all_companies = Empresa.query.all()
@@ -81,6 +102,18 @@ def get_empresas():
 def get_compnay(company_id):
     company = Empresa.query.get(company_id)
     return jsonify(company.serialize()), 200
+
+@app.route('/empresa/<int:company_id>', methods=['DELETE'])
+def delete_compnay(company_id):
+    company = Empresa.query.get(company_id)
+    db.session.delete(company)
+    db.session.commit()
+    # return jsonify(company.serialize()), 200
+    response_body = {
+        "msg": "se elimino la empresa "
+    }
+
+    return jsonify(response_body), 200
 
 
 
